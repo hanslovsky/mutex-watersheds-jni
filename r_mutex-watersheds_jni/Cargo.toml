@@ -1,0 +1,14 @@
+[package]
+name = "r_mutex-watersheds_jni"
+version = "0.1.0"
+authors = ["Philipp Hanslovsky <philipp.hanslovsky@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+jni = "0.19.0"
+r_mutex-watersheds = { path = "../../r_mutex-watersheds" }
+
+[lib]
+crate_type = ["cdylib"]

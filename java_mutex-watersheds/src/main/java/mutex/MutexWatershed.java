@@ -5,17 +5,9 @@ package mutex;
 
 import net.imglib2.Dimensions;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.array.ArrayImg;
-import net.imglib2.img.array.ArrayImgs;
-import net.imglib2.img.basictypeaccess.array.DoubleArray;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-import net.imglib2.util.ConstantUtils;
 import net.imglib2.util.Intervals;
-import net.imglib2.view.Views;
 import net.imglib2.view.composite.Composite;
-
-import java.util.Random;
 
 
 public class MutexWatershed {
@@ -51,18 +43,5 @@ public class MutexWatershed {
 
     static {
         System.loadLibrary("r_mutex_watersheds_jni");
-    }
-
-    public static void main(String... args) {
-        final ArrayImg<DoubleType, DoubleArray> data = ArrayImgs.doubles(4, 3, 2);
-        final Random rng = new Random(1L);
-        data.forEach(t -> t.setReal(rng.nextDouble() - 0.5));
-        Views.hyperSlice(Views.hyperSlice(data, 2, 0L), 0, 0L).forEach(t -> t.setReal(Double.NaN));
-        Views.hyperSlice(Views.hyperSlice(data, 2, 1L), 1, 0L).forEach(t -> t.setReal(Double.NaN));
-        final int[] assignments = mutexWatershed(
-                Views.collapseReal(data),
-                new long[][]{{-1, 0}, {0, -1}});
-        for (int i = 0; i < assignments.length; ++i)
-            System.out.println(i + " -> " + assignments[i]);
     }
 }

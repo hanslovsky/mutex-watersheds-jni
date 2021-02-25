@@ -9,17 +9,34 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+
+    id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
 repositories {
     // Use JCenter for resolving dependencies.
     jcenter()
+    mavenCentral()
+    maven { url = uri("https://maven.scijava.org/content/groups/public") }
 }
 
 dependencies {
     // Use JUnit test framework.
     testImplementation("junit:junit:4.13")
+    testImplementation("org.janelia.saalfeldlab:paintera:0.26.0")
+    testImplementation("org.openjfx:javafx-graphics:13.0.2")
+    testImplementation("org.openjfx:javafx-base:13.0.2")
+    testImplementation("org.openjfx:javafx-controls:13.0.2")
+    testImplementation("org.openjfx:javafx-media:13.0.2")
+    testImplementation("org.openjfx:javafx-swing:13.0.2")
+    testImplementation("org.openjfx:javafx-fxml:13.0.2")
+    testImplementation("org.openjfx:javafx-web:13.0.2")
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api("net.imglib2:imglib2:5.11.1")
+}
+
+javafx {
+    version = "13"
+    modules("javafx.graphics", "javafx.base", "javafx.controls", "javafx.media", "javafx.swing", "javafx.fxml", "javafx.web")
 }

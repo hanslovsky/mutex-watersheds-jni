@@ -21,7 +21,7 @@ use jni::sys::{jdoubleArray, jintArray, jlongArray, jobject};
 use log::{debug, trace};
 use pretty_env_logger as _log;
 
-use r_mutex_watersheds::mutex;
+use mutex_watersheds::mutex;
 
 // NOTE Iterating over RAI in Rust JNI is extremely slow and generating the graph takes a long time.
 //      It is faster to copy from RAI into double[], then copy from double[] to Vec with a single call.

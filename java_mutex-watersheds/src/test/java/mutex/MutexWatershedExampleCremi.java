@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import net.imglib2.Cursor;
+import net.imglib2.FinalInterval;
 import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.cache.img.CachedCellImg;
@@ -37,7 +38,9 @@ public class MutexWatershedExampleCremi {
 
         @Override
         public void start(Stage primaryStage) throws Exception {
+
             final Interval cutOut = Intervals.createMinMax(400, 400, 45, 700, 700, 65);
+//            final Interval cutOut = new FinalInterval(600, 600, 60);
 
             final N5HDF5Reader hdf5 = new N5HDF5Reader("/home/zottel/Downloads/sample_B_20160501.hdf", true, 32, 32, 3);
             final RandomAccessibleInterval<UnsignedByteType> raw = Views.zeroMin(Views.interval(N5Utils.<UnsignedByteType>open(hdf5, "volumes/raw"), cutOut));
@@ -51,6 +54,9 @@ public class MutexWatershedExampleCremi {
             new Thread(() -> {
                 final double[] resolution = new double[]{1.0, 1.0, 10.0};
                 final double[] offset = new double[]{0.0, 0.0, 0.0};
+
+                final Random rng = new Random(1L);
+                final double flipProbability = 0.0;//1e-5;
 
                 System.out.println("Preparing data");
                 final ArrayImg<DoubleType, DoubleArray> data = ArrayImgs.doubles(raw.dimension(0), raw.dimension(1), raw.dimension(2), 3);
@@ -67,7 +73,7 @@ public class MutexWatershedExampleCremi {
                                     Views.interval(groundTruth, min1, max1),
                                     Views.interval(groundTruth, min2, max2),
                                     Views.interval(Views.hyperSlice(data, 3, d), min2, max2))
-                            .forEachPixel((gt1, gt2, aff) -> aff.setReal(gt1.valueEquals(gt2) ? 1.0 : -1.0));
+                            .forEachPixel((gt1, gt2, aff) -> aff.setReal((gt1.valueEquals(gt2) ? 1.0 : -1.0) * (rng.nextDouble() < flipProbability ? -1.0 : 1.0)));
                 }
 
                 System.out.println("Running mutex watershed");

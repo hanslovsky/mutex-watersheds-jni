@@ -3,10 +3,12 @@
  */
 package mutex;
 
+import net.imglib2.Cursor;
 import net.imglib2.Dimensions;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
+import net.imglib2.view.Views;
 import net.imglib2.view.composite.Composite;
 
 
@@ -17,12 +19,48 @@ public class MutexWatershed {
             final long[]... offsets
     ) {
         final int[] assignments = new int[(int) Intervals.numElements(affinities)];
-        mutexWatershed(affinities, assignments, makeOffsetStrides(affinities, offsets));
+        // NOTE Iterating over RAI in Rust JNI is extremely slow and generating the graph takes a long time.
+        //      It is faster to copy from RAI into double[], then copy from double[] to Vec with a single call.
+        //      native implementation mutexWatershed is preferred over
+        //      native implementation mutexWatershedFromRAI
+        mutexWatershedImpl(affinities, assignments, makeOffsetStrides(affinities, offsets));
+        // mutexWatershedImplFromRAI(affinities, assignments, makeOffsetStrides(affinities, offsets));
         return assignments;
     };
 
-    private static native <T extends RealType<T>, C extends Composite<T>> void mutexWatershed(
+    private static <T extends RealType<T>, C extends Composite<T>> void mutexWatershedImplFromRAI(
             final RandomAccessibleInterval<C> affinities,
+            final int[] assignments,
+            final long... offsetStrides
+    ) {
+        mutexWatershedFromRAI(affinities, assignments, offsetStrides);
+    }
+
+    private static <T extends RealType<T>, C extends Composite<T>> void mutexWatershedImpl(
+            final RandomAccessibleInterval<C> affinities,
+            final int[] assignments,
+            final long... offsetStrides
+    ) {
+        final double[] affinitiesArray = new double[((int)Intervals.numElements(affinities)) * offsetStrides.length];
+        final Cursor<C> cursor = Views.flatIterable(affinities).cursor();
+        for (int index = 0; index < affinitiesArray.length;) {
+            final C composite = cursor.next();
+            for (int offsetIndex = 0; offsetIndex < offsetStrides.length; ++offsetIndex) {
+                affinitiesArray[index] = composite.get(offsetIndex).getRealDouble();
+                ++index;
+            }
+        }
+        mutexWatershed(affinitiesArray, assignments, offsetStrides);
+    }
+
+    private static native <T extends RealType<T>, C extends Composite<T>> void mutexWatershedFromRAI(
+            final RandomAccessibleInterval<C> affinities,
+            final int[] assignments,
+            final long... offsetStrides
+    );
+
+    private static native <T extends RealType<T>, C extends Composite<T>> void mutexWatershed(
+            final double[] affinities,
             final int[] assignments,
             final long... offsetStrides
     );

@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 jni = "0.19.0"
 r_mutex-watersheds = { path = "../../r_mutex-watersheds" }
+log = "0.4"
+pretty_env_logger = "0.4"
 
 [lib]
 crate_type = ["cdylib"]

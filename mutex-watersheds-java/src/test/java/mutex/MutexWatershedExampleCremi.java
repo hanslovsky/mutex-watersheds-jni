@@ -42,7 +42,7 @@ public class MutexWatershedExampleCremi {
             final Interval cutOut = Intervals.createMinMax(400, 400, 45, 700, 700, 65);
 //            final Interval cutOut = new FinalInterval(600, 600, 60);
 
-            final N5HDF5Reader hdf5 = new N5HDF5Reader("/home/zottel/Downloads/sample_B_20160501.hdf", true, 32, 32, 3);
+            final N5HDF5Reader hdf5 = new N5HDF5Reader("/home/zottel/Downloads/sample_A_20160501.hdf", true, 32, 32, 3);
             final RandomAccessibleInterval<UnsignedByteType> raw = Views.zeroMin(Views.interval(N5Utils.<UnsignedByteType>open(hdf5, "volumes/raw"), cutOut));
             final RandomAccessibleInterval<UnsignedLongType> groundTruth = Views.zeroMin(Views.interval(N5Utils.<UnsignedLongType>open(hdf5, "volumes/labels/neuron_ids"), cutOut));
 

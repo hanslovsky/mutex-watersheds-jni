@@ -80,6 +80,6 @@ public class MutexWatershed {
     }
 
     static {
-        System.loadLibrary("r_mutex_watersheds_jni");
+        System.loadLibrary("mutex_watersheds_jni");
     }
 }
